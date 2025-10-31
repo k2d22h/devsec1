@@ -3,3 +3,6 @@
 [ssh] SSH keys created and moved to $HOME\.ssh\id_rsa_github
 [install] Git 2.51.2 installed via winget
 [install] SSH keys moved to proper location
+[git] Git repository initialized with initial commit
+[git] Created branches: dev, stage, main
+[git] Configured user email: kutsiukd@gmail.com
