@@ -20,3 +20,4 @@
 [release] GitHub Actions will now build artifact, generate SBOM, sign with Cosign, and create release
 [sbom] Tested SBOM generation locally with Syft - SBOM generated successfully in dist/
 [fix] Moved security-events permission to job level in Scorecard workflow per OpenSSF requirements
+[fix] Fixed Cosign installation - using direct download instead of 404 install script
