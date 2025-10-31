@@ -24,3 +24,5 @@
 [release] Deleted and re-created v1.0.0 tag to trigger fixed release workflow
 [doc] Created FINAL_STATUS.md and QUICK_REFERENCE.md for easy navigation
 [complete] All fixes applied - workflows are now functional and running
+[fix] Corrected Cosign download URL - was using wrong URL format
+[release] Re-created v1.0.0 tag again with fixed workflow
