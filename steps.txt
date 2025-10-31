@@ -18,3 +18,4 @@
 [push] Updated CODEOWNERS with GitHub username: @k2d22h
 [release] Created tag v1.0.0 and pushed to trigger release workflow
 [release] GitHub Actions will now build artifact, generate SBOM, sign with Cosign, and create release
+[sbom] Tested SBOM generation locally with Syft - SBOM generated successfully in dist/
