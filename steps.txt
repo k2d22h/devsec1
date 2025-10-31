@@ -6,3 +6,8 @@
 [git] Git repository initialized with initial commit
 [git] Created branches: dev, stage, main
 [git] Configured user email: kutsiukd@gmail.com
+[fix] Updated Cosign signing to use --oidc-provider=github instead of deprecated COSIGN_EXPERIMENTAL
+[fix] Fixed Grype workflow exit code logic
+[doc] Added SETUP_INSTRUCTIONS.md with detailed GitHub setup steps
+[commit] Initial commit and workflow fixes committed
+[doc] Created NEXT_STEPS.md with comprehensive checklist for remaining tasks
