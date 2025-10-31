@@ -47,11 +47,9 @@ jobs:
             dist/sbom.spdx.json
 
       - name: Keyless sign artifact with Cosign
-        env:
-          COSIGN_EXPERIMENTAL: '1'
         run: |
           ART=$(ls dist/*.zip | head -n1)
-          cosign sign-blob --yes "$ART" \
+          cosign sign-blob --yes --oidc-provider=github "$ART" \
             --output-signature "$ART.sig" \
             --output-certificate "$ART.cert"
 
