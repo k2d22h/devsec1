@@ -1,0 +1,5 @@
+[init] Repository scaffolding created (README.md, Makefile, workflows, tasks).
+[download] Downloaded 41_scan_stream_default.py from savostyanenko/example_of_vulnerable_code_2 into src/
+[ssh] SSH keys created and moved to $HOME\.ssh\id_rsa_github
+[install] Git 2.51.2 installed via winget
+[install] SSH keys moved to proper location

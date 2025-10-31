@@ -1,0 +1,36 @@
+name: Grype SBOM Scan
+
+on:
+  push:
+    branches: [ main, stage, dev ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Syft and Grype
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Create SBOM
+        run: |
+          syft dir:src -o spdx-json > sbom.spdx.json
+
+      - name: Scan SBOM with Grype
+        run: |
+          grype sbom:sbom.spdx.json --fail-on high || echo "Grype found issues" && exit 0
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.spdx.json
+

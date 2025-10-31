@@ -1,0 +1,13 @@
+dist/
+build/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+.vscode/
+*.sig
+*.sbom.json
+*.spdx.json
+*.zip
+
