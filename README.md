@@ -11,8 +11,8 @@ DevSecOps Demo Repository
 Алгоритм виконання (Devops)
 1) Підготовка репозиторію
    - Створити на GitHub публічний репозиторій.
-   - Клонувати локально та додати файли з цього прикладу.
-   - Додати чотирьох користувачів до репозиторію через Settings → Collaborators; лише одному надати право push у `main` або повністю заборонити прямий push через Branch protection (рекомендовано).
+   - Клонувати локально та додати файл src/41_scan_stream_default.py з репозиторія (https://github.com/savostyanenko/example_of_vulnerable_code_2.git)
+   - Додати чотирьох користувачів до репозиторію через Settings → Collaborators; лише одному надати право push у `main` або повністю заборонити прямий push через Branch protection .
 
 2) Гілки та політики
    - Створити гілки: `dev`, `stage`, `main`.
