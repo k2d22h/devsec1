@@ -6,15 +6,15 @@ on:
       - 'v*'
 
 permissions:
-  contents: write
-  id-token: write
-  actions: read
+  contents: write      # Для створення релізу та завантаження файлів
+  id-token: write      # Для Cosign keyless (OIDC)
+  actions: read        # Для upload-artifact (не обов’язково, але корисно)
 
 jobs:
   build-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -25,11 +25,19 @@ jobs:
       - name: Install Syft and Cosign
         shell: bash
         run: |
+          # Встановлення Syft
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
-          curl -LO https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
+          
+          # Встановлення Cosign (офіційний реліз)
+          COSIGN_VERSION=$(curl -s https://api.github.com/repos/sigstore/cosign/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+          curl -LO https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64
           sudo mv cosign-linux-amd64 /usr/local/bin/cosign
-          chmod +x /usr/local/bin/cosign
+          sudo chmod +x /usr/local/bin/cosign
+          
+          # Перевірка версій
+          echo "Syft version:"
           syft version
+          echo "Cosign version:"
           cosign version
 
       - name: Build artifact (zip)
@@ -40,33 +48,59 @@ jobs:
 
       - name: Generate SBOM (Syft)
         run: |
-          make sbom || (echo "Falling back to direct syft" && syft dir:src -o spdx-json > dist/sbom.spdx.json)
+          # Спроба через Makefile, якщо не вийде — пряма команда
+          if ! make sbom; then
+            echo "Makefile sbom failed, using direct syft command"
+            syft dir:src -o spdx-json > dist/sbom.spdx.json
+          fi
 
-      - name: Upload artifact to workflow run
-        uses: actions/upload-artifact@v4
-        with:
-          name: artifact-${{ github.ref_name }}
-          path: |
-            dist/*.zip
-            dist/sbom.spdx.json
+      - name: List built files
+        run: |
+          echo "Contents of dist/:"
+          ls -la dist/
+          echo "Artifact to sign:"
+          ART=$(ls dist/*.zip | head -n1)
+          echo "$ART"
 
       - name: Keyless sign artifact with Cosign
+        env:
+          COSIGN_EXPERIMENTAL: "1"
         run: |
           ART=$(ls dist/*.zip | head -n1)
-          cosign sign-blob --yes --oidc-provider=github "$ART" \
-            --output-signature "$ART.sig" \
-            --output-certificate "$ART.cert"
+          echo "Signing artifact: $ART"
+
+          cosign sign-blob \
+            --bundle "${ART}.bundle" \
+            --yes \
+            "$ART" > "${ART}.sig"
+
+          echo "Signature created: ${ART}.sig"
+          echo "Bundle created: ${ART}.bundle"
+
+          # Перевірка, чи створено файли
+          [ -f "${ART}.sig" ] && echo "Signature OK" || exit 1
+          [ -f "${ART}.bundle" ] && echo "Bundle OK" || exit 1
+
+      - name: Upload artifacts to workflow run
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts-${{ github.run_id }}
+          path: |
+            dist/*.zip
+            dist/*.zip.sig
+            dist/*.zip.bundle
+            dist/sbom.spdx.json
 
       - name: Create GitHub Release
-        id: create_release
         uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
           draft: false
           prerelease: false
+          generate_release_notes: true
           files: |
             dist/*.zip
             dist/*.zip.sig
-            dist/*.zip.cert
+            dist/*.zip.bundle
             dist/sbom.spdx.json
-
